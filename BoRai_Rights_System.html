@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ระบบสิทธิการรักษาพยาบาล — โรงพยาบาลบ่อไร่</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+--pri:#085041;--pri-l:#0F6E56;--pri-ll:#E1F5EE;--accent:#1D9E75;
+--blue:#185FA5;--blue-l:#E6F1FB;
+--amber:#854F0B;--amber-l:#FAEEDA;
+--red:#A32D2D;--red-l:#FCEBEB;
+--green:#3B6D11;--green-l:#EAF3DE;
+--bg:#f4f6f3;--card:#fff;--border:#d8e0da;--border-l:#eef1ee;
+--txt:#1a1a1a;--txt2:#555;--txt3:#888;
+--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.6}
+a{color:var(--pri);text-decoration:none}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,#053B2E 0%,#085041 40%,#0A6652 100%);color:#fff;padding:0}
+.hdr-inner{max-width:1080px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:14px}
+.hdr-logo{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;border:2px solid rgba(255,255,255,.2)}
+.hdr-txt h1{font-size:18px;font-weight:600;letter-spacing:.02em}
+.hdr-txt p{font-size:12px;opacity:.7;margin-top:1px}
+.hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.hdr-chip{font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.15)}
+.admin-btn{font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-family:inherit;transition:.2s}
+.admin-btn:hover{background:rgba(255,255,255,.2)}
+.admin-btn.active{background:#1D9E75;border-color:#1D9E75}
+
+/* ── NAV ── */
+.nav-wrap{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;display:flex;gap:2px;padding:6px 24px;overflow-x:auto}
+.nav-btn{padding:8px 16px;border:none;background:transparent;cursor:pointer;border-radius:8px;font-size:13px;font-weight:500;color:var(--txt2);white-space:nowrap;transition:.15s;font-family:inherit}
+.nav-btn:hover{background:var(--pri-ll);color:var(--pri)}
+.nav-btn.on{background:var(--pri-ll);color:var(--pri);font-weight:600}
+
+/* ── MAIN ── */
+.main{max-width:1080px;margin:0 auto;padding:16px 24px 40px}
+.page{display:none}.page.on{display:block}
+
+/* ── COMPONENTS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-flat{box-shadow:none}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.sec-title{font-size:14px;font-weight:600;color:var(--pri)}
+.sum-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.sum-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:var(--shadow)}
+.sum-n{font-size:24px;font-weight:700}.sum-l{font-size:12px;color:var(--txt3);margin-top:2px}
+
+/* ── FORM ── */
+input[type=text],input[type=search],input[type=password],select,textarea{
+padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:#fff;color:var(--txt);font-family:inherit;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,158,117,.12)}
+textarea{resize:vertical;min-height:60px}
+label{font-size:12px;color:var(--txt2);font-weight:600;display:block;margin-bottom:4px}
+.fg{margin-bottom:12px}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg2 .fg{margin-bottom:0}
+.fg.full{grid-column:1/-1}
+.srow{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.srow input,.srow select{flex:1;min-width:120px}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--txt);transition:.15s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--bg)}
+.btn-p{background:var(--pri);color:#fff;border-color:var(--pri)}.btn-p:hover{background:var(--pri-l)}
+.btn-d{color:var(--red);border-color:var(--red-l)}.btn-d:hover{background:var(--red-l)}
+.btn-s{color:var(--green);border-color:var(--green-l)}.btn-s:hover{background:var(--green-l)}
+.btn-b{color:var(--blue);border-color:var(--blue-l)}.btn-b:hover{background:var(--blue-l)}
+.btn-sm{padding:4px 10px;font-size:12px}
+
+/* ── BADGES ── */
+.bdg{font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;display:inline-block}
+.b-code{background:var(--pri-ll);color:var(--pri)}
+.b-pc{background:var(--blue-l);color:#0C447C}
+.b-on{background:var(--green-l);color:var(--green)}
+.b-off{background:var(--red-l);color:var(--red)}
+.b-pay1{background:var(--blue-l);color:#0C447C}
+.b-pay2{background:var(--green-l);color:var(--green)}
+.b-pay3{background:var(--amber-l);color:var(--amber)}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+th{text-align:left;padding:8px 10px;font-size:11px;color:var(--txt2);font-weight:600;background:var(--bg);border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--border-l);vertical-align:middle}
+tr:hover td{background:#f8faf8}
+
+/* ── SERVICE VIEW ── */
+.svc-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;box-shadow:var(--shadow)}
+.svc-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:.1s}
+.svc-hd:hover{background:var(--bg)}
+.svc-cat{font-size:11px;font-weight:700;background:var(--pri-ll);color:var(--pri);padding:3px 8px;border-radius:4px;flex-shrink:0}
+.svc-nm{font-size:14px;font-weight:600;flex:1}
+.svc-arrow{font-size:12px;color:var(--txt3);transition:.2s;flex-shrink:0}
+.svc-arrow.open{transform:rotate(90deg)}
+.svc-body{display:none;padding:12px 16px;border-top:1px solid var(--border-l)}
+.svc-body.open{display:block}
+.svc-note{font-size:12px;color:#993C1D;background:#FAECE7;padding:8px 12px;border-radius:6px;margin-bottom:10px;line-height:1.65;white-space:pre-wrap;border-left:4px solid #D85A30}
+.cf{background:var(--green-l)!important;color:var(--green);font-weight:600}
+.cp{background:var(--blue-l)!important;color:#0C447C;font-weight:600}
+.cy{background:var(--red-l)!important;color:var(--red)}
+td.td-r{text-align:left;font-weight:600;background:#f8faf9;white-space:nowrap}
+.rc{background:var(--pri-ll);color:var(--pri);font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:3px}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-start;justify-content:center;padding:3vh 16px;overflow-y:auto}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:560px;margin:auto;position:relative}
+.modal h2{font-size:16px;font-weight:600;color:var(--pri);margin-bottom:16px}
+.modal-foot{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+
+/* ── PICKER ── */
+.picker{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.picker-search{width:100%;padding:8px 12px;border:none;border-bottom:1px solid var(--border-l);font-size:13px;font-family:inherit}
+.picker-search:focus{outline:none;background:var(--bg)}
+.picker-list{max-height:200px;overflow-y:auto;padding:4px}
+.pk-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:12px}
+.pk-item:hover{background:var(--bg)}
+.pk-item input{accent-color:var(--pri);width:15px;height:15px}
+.row-editor{margin-top:12px}
+.re-item{padding:10px;background:var(--bg);border:1px solid var(--border-l);border-radius:8px;margin-bottom:6px}
+.re-title{font-size:12px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.re-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
+.re-grid label{font-size:10px}
+.re-grid input{padding:5px 8px;font-size:11px}
+
+/* ── SLIDE VIEW ── */
+.slide-overlay{display:none;position:fixed;inset:0;background:#111;z-index:300;flex-direction:column}
+.slide-overlay.open{display:flex}
+.slide-top{padding:8px 16px;display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.3)}
+.slide-top button{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-family:inherit;font-size:12px}
+.slide-top button:hover{background:rgba(255,255,255,.2)}
+.slide-top .sp-info{color:#9FE1CB;font-size:12px;flex:1;text-align:center}
+.slide-main{flex:1;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:20px}
+.slide-frame{width:960px;max-width:100%;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4);min-height:400px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pri);color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;z-index:999;display:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.toast.show{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+.empty{text-align:center;padding:32px;color:var(--txt3);font-size:13px}
+.locked-msg{text-align:center;padding:40px;color:var(--txt3)}
+.locked-msg p{font-size:14px;margin-bottom:8px}
+
+/* ── PRINT ── */
+@media print{
+.hdr,.nav-wrap,.toast,.slide-overlay{display:none!important}
+.main{padding:0}.page{display:block!important}
+.card{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid}
+*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+@media(max-width:640px){
+.fg2{grid-template-columns:1fr}
+.hdr-right{display:none}
+.hdr-inner{padding:12px 16px}
+.nav{padding:4px 12px}
+.main{padding:12px 12px 32px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr"><div class="hdr-inner">
+  <div class="hdr-logo">บร</div>
+  <div class="hdr-txt">
+    <h1>ระบบสิทธิการรักษาพยาบาล — โรงพยาบาลบ่อไร่</h1>
+    <p>กลุ่มงานประกันสุขภาพ ยุทธศาสตร์ และสารสนเทศทางการแพทย์</p>
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-chip">สายด่วน สปสช. 1330</span>
+    <button class="admin-btn" id="adminToggle" onclick="toggleAdmin()">🔒 เจ้าหน้าที่</button>
+  </div>
+</div></div>
+
+<div class="nav-wrap"><div class="nav" id="navBar">
+  <button class="nav-btn on" onclick="go('search',this)">🔍 สืบค้นสิทธิ</button>
+  <button class="nav-btn" onclick="go('services',this)">🏥 บริการตามสิทธิ</button>
+  <button class="nav-btn admin-only" onclick="go('rights',this)" style="display:none">📋 จัดการสิทธิ</button>
+  <button class="nav-btn admin-only" onclick="go('svcmg',this)" style="display:none">⚙️ จัดการบริการ</button>
+  <button class="nav-btn admin-only" onclick="go('export',this)" style="display:none">📤 ส่งออก</button>
+</div></div>
+
+<div class="main">
+
+<!-- ══ PAGE: SEARCH ══ -->
+<div class="page on" id="pg-search">
+  <div class="sum-bar" id="sumBar"></div>
+  <div class="srow">
+    <input type="search" id="sq" placeholder="ค้นหา ชื่อสิทธิ, รหัส HOSXP, Pcode, บัญชีการเงิน..." oninput="renderSearch()">
+    <select id="sPc" onchange="renderSearch()"><option value="">Pcode ทั้งหมด</option></select>
+    <select id="sSt" onchange="renderSearch()"><option value="">ทุกสถานะ</option><option value="active">ใช้งาน</option><option value="inactive">ยกเลิก</option></select>
+  </div>
+  <div id="searchGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px"></div>
+</div>
+
+<!-- ══ PAGE: SERVICES ══ -->
+<div class="page" id="pg-services">
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:13px;font-weight:600;color:var(--pri);margin-bottom:10px">กรอกข้อมูลผู้รับบริการเพื่อกรองบริการที่เกี่ยวข้อง</div>
+    <div class="fg2" style="gap:10px">
+      <div class="fg"><label>เพศ</label>
+        <select id="fGender" onchange="renderView()"><option value="">ไม่ระบุ (แสดงทั้งหมด)</option><option value="ชาย">ชาย</option><option value="หญิง">หญิง</option></select>
+      </div>
+      <div class="fg"><label>อายุ (ปี)</label>
+        <input type="text" id="fAge" placeholder="เช่น 25, 0.5 (6เดือน)" oninput="renderView()">
+      </div>
+      <div class="fg"><label>สัญชาติ</label>
+        <select id="fNat" onchange="renderView()"><option value="">ไม่ระบุ (แสดงทั้งหมด)</option><option value="คนไทย">คนไทย</option><option value="คนไทยไร้สิทธิ">คนไทยไร้สิทธิ (ท.99)</option><option value="แรงงานต่างด้าว">แรงงานต่างด้าว</option><option value="คนต่างชาติ">คนต่างชาติ</option></select>
+      </div>
+      <div class="fg"><label>ค้นหาบริการ</label>
+        <input type="search" id="vq" placeholder="ค้นหาชื่อบริการ..." oninput="renderView()">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center">
+      <select id="vcat" onchange="renderView()" style="width:auto"><option value="">ทุกหมวด</option></select>
+      <span id="filterInfo" style="font-size:12px;color:var(--txt3)"></span>
+    </div>
+  </div>
+  <div id="viewList"></div>
+</div>
+
+<!-- ══ PAGE: RIGHTS (admin) ══ -->
+<div class="page" id="pg-rights">
+  <div class="card">
+    <div class="sec-hd"><span class="sec-title">ตาราง 1 — สิทธิการรักษา (HOSXP)</span>
+    <button class="btn btn-p btn-sm" onclick="openRM(null)">+ เพิ่มสิทธิ</button></div>
+    <div class="srow">
+      <input type="search" id="rq" placeholder="ค้นหาสิทธิ..." oninput="renderRT()">
+      <select id="rPc" onchange="renderRT()"><option value="">Pcode ทั้งหมด</option></select>
+    </div>
+    <div class="tbl-wrap"><table><thead><tr>
+      <th>รหัส</th><th>Pcode</th><th>ชื่อสิทธิ</th><th>บัญชีการเงิน</th><th>ประเภทจ่าย</th><th>สถานะ</th><th>จัดการ</th>
+    </tr></thead><tbody id="rTbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ══ PAGE: SVC MANAGE (admin) ══ -->
+<div class="page" id="pg-svcmg">
+  <div class="card">
+    <div class="sec-hd"><span class="sec-title">ตาราง 2 — บริการตามสิทธิ</span>
+    <button class="btn btn-p btn-sm" onclick="openSM(null)">+ เพิ่มบริการ</button></div>
+    <div id="svcMgList"></div>
+  </div>
+</div>
+
+<!-- ══ PAGE: EXPORT (admin) ══ -->
+<div class="page" id="pg-export">
+  <div class="card">
+    <div class="sec-title" style="margin-bottom:12px">ส่งออกข้อมูล</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="openSlideView()">🖥 เปิดสไลด์นำเสนอ</button>
+      <button class="btn btn-b" onclick="printSlides()">🖨 พิมพ์ / บันทึก PDF</button>
+      <button class="btn" onclick="exportJSON()">💾 Export JSON (สำรองข้อมูล)</button>
+      <label class="btn" style="cursor:pointer">📂 Import JSON <input type="file" accept=".json" onchange="importJSON(event)" style="display:none"></label>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-title" style="margin-bottom:8px">คำอธิบายสีในตาราง</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px">
+      <span><span style="display:inline-block;width:16px;height:16px;background:var(--green-l);border:1px solid #c0dd97;border-radius:3px;vertical-align:middle;margin-right:4px"></span><b style="color:var(--green)">ตามสิทธิ</b></span>
+      <span><span style="display:inline-block;width:16px;height:16px;background:var(--blue-l);border:1px solid #b5d4f4;border-radius:3px;vertical-align:middle;margin-right:4px"></span><b style="color:#0C447C">ฟรีโครงการ PPFS</b></span>
+      <span><span style="display:inline-block;width:16px;height:16px;background:var(--red-l);border:1px solid #f7c1c1;border-radius:3px;vertical-align:middle;margin-right:4px"></span><b style="color:var(--red)">ชำระเงินเอง</b></span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: RIGHT ══ -->
+<div class="modal-bg" id="rmBg"><div class="modal">
+  <h2 id="rmT">เพิ่มสิทธิ</h2>
+  <div class="fg2">
+    <div class="fg"><label>รหัส HOSXP *</label><input id="rf-c"></div>
+    <div class="fg"><label>Pcode *</label><select id="rf-p"><option value="UC">UC</option><option value="UA">UA</option><option value="A1">A1</option><option value="A2">A2</option><option value="A7">A7</option><option value="A8">A8</option><option value="A9">A9</option><option value="AL">AL</option><option value="AZ">AZ</option><option value="ST">ST</option><option value="LGO">LGO</option></select></div>
+    <div class="fg full"><label>ชื่อสิทธิ *</label><input id="rf-n"></div>
+    <div class="fg"><label>HIPData</label><input id="rf-h"></div>
+    <div class="fg"><label>รหัสสิทธิการเงิน</label><input id="rf-fc"></div>
+    <div class="fg full"><label>ชื่อบัญชีการเงิน *</label><input id="rf-fn"></div>
+    <div class="fg"><label>ประเภทการจ่าย</label><select id="rf-ps"><option>ลูกหนี้สิทธิ</option><option>ชำระเองเบิกได้</option><option>ชำระเองเบิกไม่ได้</option></select></div>
+    <div class="fg"><label>สถานะ</label><select id="rf-st"><option value="active">ใช้งาน</option><option value="inactive">ยกเลิก</option></select></div>
+    <div class="fg full"><label>หมายเหตุ</label><textarea id="rf-no" rows="2"></textarea></div>
+  </div>
+  <div class="modal-foot"><button class="btn" onclick="closeMdl('rmBg')">ยกเลิก</button><button class="btn btn-p" onclick="saveR()">บันทึก</button></div>
+</div></div>
+
+<!-- ══ MODAL: SERVICE ══ -->
+<div class="modal-bg" id="smBg"><div class="modal" style="max-width:640px">
+  <h2 id="smT">เพิ่มบริการ</h2>
+  <div class="fg2">
+    <div class="fg"><label>หมวดบริการ *</label><input id="sf-cat"></div>
+    <div class="fg"><label>สถานะ</label><select id="sf-st"><option value="active">ใช้งาน</option><option value="inactive">ปิด</option></select></div>
+    <div class="fg full"><label>ชื่อบริการ *</label><input id="sf-nm"></div>
+    <div class="fg full"><label>หัวคอลัมน์ย่อย (คั่นด้วย , )</label><input id="sf-co" oninput="renderRE()" placeholder="เช่น ถอนฟัน,อุดฟัน,ขูดหินปูน"></div>
+  </div>
+  <div style="background:var(--bg);border:1px solid var(--border-l);border-radius:8px;padding:12px;margin:12px 0">
+    <div style="font-size:12px;font-weight:600;color:var(--pri);margin-bottom:8px">เงื่อนไขกรองผู้รับบริการ (ไม่ระบุ = แสดงทุกคน)</div>
+    <div class="fg2">
+      <div class="fg"><label>เพศ</label><select id="sf-gen"><option value="">ไม่จำกัด</option><option value="ชาย">เฉพาะชาย</option><option value="หญิง">เฉพาะหญิง</option></select></div>
+      <div class="fg"><label>สัญชาติ</label><select id="sf-nat"><option value="">ไม่จำกัด</option><option value="คนไทย">คนไทย</option><option value="คนไทยไร้สิทธิ">คนไทยไร้สิทธิ (ท.99)</option><option value="แรงงานต่างด้าว">แรงงานต่างด้าว</option><option value="คนต่างชาติ">คนต่างชาติ</option></select></div>
+      <div class="fg"><label>อายุต่ำสุด (ปี)</label><input type="text" id="sf-amin" placeholder="0"></div>
+      <div class="fg"><label>อายุสูงสุด (ปี)</label><input type="text" id="sf-amax" placeholder="999 (ไม่จำกัด)"></div>
+    </div>
+  </div>
+  <div class="fg"><label>หมายเหตุ</label><textarea id="sf-no" rows="2"></textarea></div>
+  <div class="fg"><label>เลือกสิทธิที่เชื่อมโยง</label>
+    <div class="picker"><input type="search" class="picker-search" id="pkS" placeholder="กรองสิทธิ..." oninput="renderPK()"><div class="picker-list" id="pkList"></div></div>
+  </div>
+  <div class="row-editor" id="reWrap"></div>
+  <div class="modal-foot"><button class="btn" onclick="closeMdl('smBg')">ยกเลิก</button><button class="btn btn-p" onclick="saveS()">บันทึก</button></div>
+</div></div>
+
+<!-- ══ MODAL: ADMIN LOGIN ══ -->
+<div class="modal-bg" id="loginBg"><div class="modal" style="max-width:360px">
+  <h2>เข้าสู่ระบบเจ้าหน้าที่</h2>
+  <div class="fg"><label>รหัสผ่าน</label><input type="password" id="pwdIn" placeholder="กรอกรหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()"></div>
+  <div class="modal-foot"><button class="btn" onclick="closeMdl('loginBg')">ยกเลิก</button><button class="btn btn-p" onclick="doLogin()">เข้าสู่ระบบ</button></div>
+</div></div>
+
+<!-- ══ SLIDE OVERLAY ══ -->
+<div class="slide-overlay" id="slideOL">
+  <div class="slide-top">
+    <button onclick="closeSlide()">✕ ปิด</button>
+    <button onclick="prevSL()">← ก่อนหน้า</button>
+    <span class="sp-info" id="slInfo">1/1</span>
+    <button onclick="nextSL()">ถัดไป →</button>
+    <button onclick="printFromSlide()" style="background:#1D9E75;border-color:#1D9E75">🖨 PDF</button>
+  </div>
+  <div class="slide-main"><div class="slide-frame" id="slFrame"></div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════ DEFAULT DATA ══════════════
+var DEFAULT_RIGHTS = [
+  {id:1,code:"10",pcode:"A1",name:"ชำระเงินเอง",hip:"CSH",finCode:"27",finName:"ชำระเงิน",paidst:"ชำระเองเบิกไม่ได้",note:"",status:"active"},
+  {id:2,code:"11",pcode:"A1",name:"ต่างด้าวชำระเงินเอง (พม่า ลาว กัมพูชา)",hip:"CSH",finCode:"27",finName:"ชำระเงิน",paidst:"ชำระเองเบิกไม่ได้",note:"",status:"active"},
+  {id:3,code:"12",pcode:"AL",name:"ประกันสุขภาพแรงงานต่างด้าว-ในอำเภอ",hip:"NRD",finCode:"21",finName:"แรงงานต่างด้าว",paidst:"ลูกหนี้สิทธิ",note:"ใช้บริการในอำเภอบ่อไร่",status:"active"},
+  {id:4,code:"13",pcode:"AL",name:"ประกันสุขภาพแรงงานต่างด้าว-นอกอำเภอ",hip:"NRD",finCode:"22",finName:"แรงงานต่างด้าว นอก CUP",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:5,code:"15",pcode:"UC",name:"UC ร่วมจ่าย-ในเขตอำเภอ",hip:"UCS",finCode:"02",finName:"UC ใน CUP ร่วมจ่าย 30 บาท",paidst:"ลูกหนี้สิทธิ",note:"ร่วมจ่าย 30 บาท",status:"active"},
+  {id:6,code:"16",pcode:"UC",name:"UC ร่วมจ่าย-นอกเขตอำเภอ",hip:"UCS",finCode:"07",finName:"UC นอก CUP ในจังหวัด",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:7,code:"17",pcode:"UC",name:"UC ร่วมจ่าย-ต่างจังหวัด (ฉุกเฉิน)",hip:"UCS",finCode:"03",finName:"บริการเฉพาะ (CR)",paidst:"ลูกหนี้สิทธิ",note:"กรณีฉุกเฉินต่างจังหวัด",status:"active"},
+  {id:8,code:"19",pcode:"UA",name:"เด็กแรกเกิด",hip:"UCS",finCode:"03",finName:"บริการเฉพาะ (CR)",paidst:"ลูกหนี้สิทธิ",note:"นำใบแจ้งเกิดลงทะเบียนภายใน 1 สัปดาห์",status:"active"},
+  {id:9,code:"21",pcode:"A2",name:"จ่ายตรง (ข้าราชการ กรมบัญชีกลาง)",hip:"OFC",finCode:"17",finName:"เบิกจ่ายตรงกรมบัญชีกลาง",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:10,code:"23",pcode:"UC",name:"UC ไม่ร่วมจ่าย-ในเขตอำเภอ",hip:"WEL",finCode:"01",finName:"UC ใน CUP",paidst:"ลูกหนี้สิทธิ",note:"ผู้สูงอายุ ผู้พิการ ผู้มีรายได้น้อย",status:"active"},
+  {id:11,code:"24",pcode:"UC",name:"UC ไม่ร่วมจ่าย-นอกเขตอำเภอ",hip:"WEL",finCode:"07",finName:"UC นอก CUP ในจังหวัด",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:12,code:"25",pcode:"UC",name:"UC ไม่ร่วมจ่าย-ต่างจังหวัด (ฉุกเฉิน)",hip:"WEL",finCode:"03",finName:"บริการเฉพาะ (CR)",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:13,code:"30",pcode:"A7",name:"ประกันสังคม (รพ.ตราด)",hip:"SSS",finCode:"10",finName:"ประกันสังคม ในเครือข่าย",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:14,code:"32",pcode:"A1",name:"ประกันสังคม (ชำระเงินเอง/ปกส.)",hip:"CSH",finCode:"27",finName:"ชำระเงิน",paidst:"ชำระเองเบิกได้",note:"",status:"active"},
+  {id:15,code:"34",pcode:"A7",name:"ประกันสังคมทันตกรรม",hip:"A8",finCode:"13",finName:"ประกันสังคม กองทุนทดแทน",paidst:"ลูกหนี้สิทธิ",note:"วงเงิน 900 บาท/ปี",status:"active"},
+  {id:16,code:"38",pcode:"A8",name:"ประกันสังคม (บาดเจ็บจากการทำงาน)",hip:"A8",finCode:"13",finName:"ประกันสังคม กองทุนทดแทน",paidst:"ลูกหนี้สิทธิ",note:"ต้องมี กท.44+กท.16",status:"active"},
+  {id:17,code:"41",pcode:"A9",name:"พรบ.ผู้ประสบภัยจากรถ",hip:"INS",finCode:"28",finName:"พรบ.รถ",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:18,code:"63",pcode:"UC",name:"ฟรีโครงการ PP FS (ส่งเสริม/ป้องกัน)",hip:"UCS",finCode:"06",finName:"UC-PP สร้างเสริมสุขภาพ",paidst:"ลูกหนี้สิทธิ",note:"วัคซีน EPI, คัดกรอง, ฝากครรภ์",status:"active"},
+  {id:19,code:"75",pcode:"ST",name:"Stateless นอกอำเภอ (ท99)",hip:"STP",finCode:"25",finName:"บุคคลปัญหาสิทธิ นอก CUP",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:20,code:"80",pcode:"A1",name:"ต่างชาติชำระเงินเอง",hip:"CSH",finCode:"27",finName:"ชำระเงิน",paidst:"ชำระเองเบิกไม่ได้",note:"",status:"active"},
+  {id:21,code:"99",pcode:"ST",name:"Stateless ในอำเภอ (ท99)",hip:"STP",finCode:"24",finName:"บุคคลปัญหาสิทธิ ใน CUP",paidst:"ลูกหนี้สิทธิ",note:"",status:"active"},
+  {id:22,code:"L1",pcode:"A2",name:"สิทธิข้าราชการท้องถิ่น",hip:"LGO",finCode:"18",finName:"เบิกจ่ายตรง อปท.",paidst:"ลูกหนี้สิทธิ",note:"อบต. อบจ. เทศบาล",status:"active"},
+];
+
+var DEFAULT_SERVICES = [
+  {id:1,cat:"ทันตกรรม",name:"บริการทันตกรรม (ถอน/อุด/ขูด/ฟันปลอม)",cols:"ถอนฟัน,อุดฟัน,ขูดหินปูน,ฟันปลอม",note:"• ทันตกรรม UC นอกอำเภอ: ไม่เกิน 700 บาท/คน/ครั้ง\n• ผ่าฟันคุดไม่มีอาการ/เพื่อจัดฟัน: ชำระเงินเอง\n• ปกส. วงเงิน 900 บาท/ปี ถ้าเกินใช้สิทธิ 32",status:"active",gender:"",ageMin:0,ageMax:999,nat:"",
+   rows:[{rid:5,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ตามสิทธิ"]},{rid:10,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ตามสิทธิ"]},{rid:6,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง (10)"]},{rid:7,v:["ชำระเงินเอง (10)","ชำระเงินเอง (10)","ชำระเงินเอง (10)","ชำระเงินเอง (10)"]},{rid:13,v:["ปกส. ทันตกรรม (34)","ปกส. ทันตกรรม (34)","ปกส. ทันตกรรม (34)","ชำระเงิน ปกส."]},{rid:21,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ตามสิทธิ"]},{rid:19,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง (10)"]},{rid:3,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ชำระเงิน ตด. (11)"]},{rid:4,v:["ชำระเงิน ตด.","ชำระเงิน ตด.","ชำระเงิน ตด.","ชำระเงิน ตด."]},{rid:20,v:["ต่างชาติ (80)","ต่างชาติ (80)","ต่างชาติ (80)","ต่างชาติ (80)"]},{rid:9,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ตามสิทธิ"]},{rid:22,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ตามสิทธิ"]}]},
+  {id:2,cat:"วัคซีน",name:"วัคซีน EPI / dT ผู้ใหญ่ / ไข้หวัดใหญ่ 7 กลุ่มเสี่ยง",cols:"วัคซีน EPI (เด็ก),วัคซีน dT ผู้ใหญ่,ไข้หวัดใหญ่ (กลุ่มเสี่ยง)",note:"• EPI: ฟรีโครงการ PPFS (63) สำหรับ UC ทุกประเภท ท99 บ่อไร่ ข้าราชการ\n• ไข้หวัดใหญ่: เฉพาะ 7 กลุ่มเสี่ยง",status:"active",gender:"",ageMin:0,ageMax:999,nat:"",
+   rows:[{rid:5,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ฟรีโครงการ PPFS (63)"]},{rid:10,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ฟรีโครงการ PPFS (63)"]},{rid:13,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ฟรีโครงการ PPFS (63)"]},{rid:21,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ชำระเงินเอง"]},{rid:3,v:["ตามสิทธิ (12)","ชำระเงินเอง ตด.","ชำระเงินเอง ตด."]},{rid:20,v:["ชำระเงินเอง","ชำระเงินเอง (80)","ชำระเงินเอง (80)"]},{rid:9,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ฟรีโครงการ PPFS (63)"]},{rid:22,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ฟรีโครงการ PPFS (63)"]}]},
+  {id:3,cat:"ฝากครรภ์และคลอด",name:"การฝากครรภ์ / การคลอด / สิทธิเด็กแรกเกิด",cols:"ฝากครรภ์,คลอด (หญิง),คลอด (ชาย/บิดา),สิทธิเด็กแรกเกิด",note:"• หญิงไทยทดสอบตั้งครรภ์ฟรีทุกสิทธิ (ไม่เกิน 4 ครั้ง/ปี)\n• UC ต่างจังหวัด: แนะนำย้ายสิทธิก่อนคลอด\n• เด็กแรกเกิดคนไทย: นำใบแจ้งเกิดลงทะเบียนภายใน 1 สัปดาห์",status:"active",gender:"หญิง",ageMin:15,ageMax:49,nat:"",
+   rows:[{rid:5,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง*"]},{rid:10,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง*"]},{rid:6,v:["ฟรีโครงการ PPFS (63)","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง*"]},{rid:7,v:["ฟรีโครงการ PPFS (63)","ชำระเงินเอง (10)","ชำระเงินเอง","ชำระเงินเอง*"]},{rid:13,v:["ฟรีโครงการ PPFS (63)","ชำระเงินเอง (ปกส.)","ชำระเงินเอง (ปกส.)","ชำระเงินเอง*"]},{rid:21,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง"]},{rid:3,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง"]},{rid:20,v:["ชำระเงินเอง ต่างชาติ","ชำระเงินเอง ต่างชาติ","ชำระเงินเอง ต่างชาติ","ชำระเงินเอง ต่างชาติ"]},{rid:9,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง*"]},{rid:22,v:["ตามสิทธิ","ตามสิทธิ","ตามสิทธิ","ชำระเงินเอง*"]}]},
+];
+
+// ══════════════ STATE ══════════════
+var DB = {rights:[], services:[]};
+var isAdmin = false;
+var ADMIN_PWD = "borai2566";
+var editRId = null, editSId = null, checkedRIds = [], rowCache = {};
+var slIdx = 0, slData = [];
+
+// ══════════════ INIT ══════════════
+function init() {
+  var saved = localStorage.getItem("BORAI_DB");
+  if (saved) { try { DB = JSON.parse(saved); } catch(e) { seedDefault(); } }
+  else { seedDefault(); }
+  renderAll();
+}
+function seedDefault() { DB.rights = DEFAULT_RIGHTS.map(function(r){return Object.assign({},r)}); DB.services = DEFAULT_SERVICES.map(function(s){return Object.assign({},s,{rows:s.rows.map(function(r){return Object.assign({},r,{v:r.v.slice()})})})}); save(); }
+function save() { localStorage.setItem("BORAI_DB", JSON.stringify(DB)); }
+function renderAll() { renderSum(); populatePc(); renderSearch(); renderView(); renderRT(); renderSvcMg(); populateViewCat(); }
+function rById(id) { return DB.rights.find(function(r){return r.id===id}); }
+
+// ══════════════ NAV ══════════════
+function go(id, btn) {
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
+  document.getElementById('pg-'+id).classList.add('on');
+}
+
+// ══════════════ ADMIN ══════════════
+function toggleAdmin() {
+  if (isAdmin) { isAdmin=false; updateAdminUI(); toast("ออกจากระบบเจ้าหน้าที่"); return; }
+  openMdl('loginBg'); document.getElementById('pwdIn').value=''; document.getElementById('pwdIn').focus();
+}
+function doLogin() {
+  if (document.getElementById('pwdIn').value === ADMIN_PWD) { isAdmin=true; closeMdl('loginBg'); updateAdminUI(); toast("เข้าสู่ระบบเจ้าหน้าที่สำเร็จ"); }
+  else { alert("รหัสผ่านไม่ถูกต้อง"); }
+}
+function updateAdminUI() {
+  document.getElementById('adminToggle').classList.toggle('active', isAdmin);
+  document.getElementById('adminToggle').textContent = isAdmin ? '🔓 ออกจากระบบ' : '🔒 เจ้าหน้าที่';
+  document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = isAdmin ? '' : 'none'; });
+  if (!isAdmin) go('search', document.querySelector('.nav-btn'));
+}
+
+// ══════════════ SUMMARY ══════════════
+function renderSum() {
+  var ar=DB.rights.filter(function(r){return r.status==='active'}).length;
+  var as=DB.services.filter(function(s){return s.status==='active'}).length;
+  document.getElementById('sumBar').innerHTML =
+    '<div class="sum-item"><div class="sum-n">'+DB.rights.length+'</div><div class="sum-l">สิทธิทั้งหมด</div></div>'+
+    '<div class="sum-item"><div class="sum-n" style="color:var(--pri)">'+ar+'</div><div class="sum-l">สิทธิใช้งาน</div></div>'+
+    '<div class="sum-item"><div class="sum-n" style="color:var(--blue)">'+as+'</div><div class="sum-l">บริการเปิดใช้</div></div>'+
+    '<div class="sum-item"><div class="sum-n" style="color:var(--amber)">'+ [...new Set(DB.rights.map(function(r){return r.pcode}))].length +'</div><div class="sum-l">กลุ่ม Pcode</div></div>';
+}
+
+// ══════════════ SEARCH ══════════════
+function populatePc() {
+  var ps=[...new Set(DB.rights.map(function(r){return r.pcode}))].sort();
+  ['sPc','rPc'].forEach(function(id){ document.getElementById(id).innerHTML='<option value="">Pcode ทั้งหมด</option>'+ps.map(function(p){return '<option>'+p+'</option>'}).join(''); });
+}
+function renderSearch() {
+  var q=(document.getElementById('sq').value||'').toLowerCase(),pc=document.getElementById('sPc').value,st=document.getElementById('sSt').value;
+  var list=DB.rights.filter(function(r){ return (!pc||r.pcode===pc)&&(!st||r.status===st)&&(!q||[r.name,r.code,r.pcode,r.finName,r.hip].some(function(v){return v.toLowerCase().indexOf(q)>=0})); });
+  var g=document.getElementById('searchGrid');
+  if(!list.length){g.innerHTML='<div class="empty" style="grid-column:1/-1">ไม่พบสิทธิที่ค้นหา</div>';return;}
+  g.innerHTML=list.map(function(r){
+    var pb={'ลูกหนี้สิทธิ':'b-pay1','ชำระเองเบิกได้':'b-pay2','ชำระเองเบิกไม่ได้':'b-pay3'};
+    return '<div class="card card-flat" style="cursor:default;'+(r.status==='inactive'?'opacity:.5':'')+'">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+        '<div style="display:flex;gap:4px"><span class="bdg b-code">'+esc(r.code)+'</span><span class="bdg b-pc">'+esc(r.pcode)+'</span></div>' +
+        '<span class="bdg '+(r.status==='active'?'b-on':'b-off')+'">'+(r.status==='active'?'ใช้งาน':'ยกเลิก')+'</span></div>' +
+      '<div style="font-size:14px;font-weight:600;margin-bottom:4px">'+esc(r.name)+'</div>' +
+      '<div style="font-size:12px;color:var(--txt2)">บัญชี: <b style="color:var(--blue)">'+esc(r.finName)+'</b></div>' +
+      '<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">' +
+        '<span class="bdg '+(pb[r.paidst]||'')+'">'+esc(r.paidst)+'</span>' +
+        '<span class="bdg" style="background:var(--bg);color:var(--txt3)">HIP: '+esc(r.hip)+'</span>' +
+        '<span class="bdg" style="background:var(--bg);color:var(--txt3)">รหัส: '+esc(r.finCode)+'</span></div>' +
+      (r.note?'<div style="font-size:11px;color:var(--txt3);margin-top:6px">📝 '+esc(r.note)+'</div>':'') +
+    '</div>';
+  }).join('');
+}
+
+// ══════════════ SERVICE VIEW ══════════════
+function populateViewCat() {
+  var cats=[]; DB.services.forEach(function(s){if(s.status==='active'&&cats.indexOf(s.cat)<0)cats.push(s.cat)});
+  document.getElementById('vcat').innerHTML='<option value="">ทุกหมวด</option>'+cats.map(function(c){return '<option>'+c+'</option>'}).join('');
+}
+function cellCls(v){if(!v)return'';if(v==='ตามสิทธิ')return'cf';if(v.indexOf('ฟรีโครงการ')>=0||v.indexOf('PPFS')>=0)return'cp';if(v.indexOf('ชำระ')>=0)return'cy';return'';}
+function renderView() {
+  var q=(document.getElementById('vq').value||'').toLowerCase(),cat=document.getElementById('vcat').value;
+  var fg=document.getElementById('fGender').value;
+  var fa=parseFloat(document.getElementById('fAge').value);
+  var fn=document.getElementById('fNat').value;
+  var hasFilter=fg||!isNaN(fa)||fn;
+  var list=DB.services.filter(function(s){
+    if(s.status!=='active')return false;
+    if(cat&&s.cat!==cat)return false;
+    if(q&&s.name.toLowerCase().indexOf(q)<0&&s.cat.toLowerCase().indexOf(q)<0)return false;
+    if(fg&&s.gender&&s.gender!==fg)return false;
+    if(!isNaN(fa)){if(s.ageMin!==undefined&&s.ageMin!==null&&fa<s.ageMin)return false;if(s.ageMax!==undefined&&s.ageMax!==null&&s.ageMax<999&&fa>s.ageMax)return false;}
+    if(fn&&s.nat&&s.nat!==fn)return false;
+    return true;
+  });
+  var info=document.getElementById('filterInfo');
+  if(hasFilter){var parts=[];if(fg)parts.push(fg);if(!isNaN(fa))parts.push('อายุ '+fa+' ปี');if(fn)parts.push(fn);info.textContent='กรอง: '+parts.join(', ')+' → พบ '+list.length+' บริการ';}else{info.textContent='';}
+  var el=document.getElementById('viewList');
+  if(!list.length){el.innerHTML='<div class="empty">ไม่พบบริการ</div>';return;}
+  el.innerHTML=list.map(function(s,si){
+    var cols=(s.cols||'').split(',').map(function(c){return c.trim()}).filter(Boolean);
+    var thead='<tr><th class="td-r">สิทธิการรักษา</th>'+cols.map(function(c){return '<th style="text-align:center">'+esc(c)+'</th>'}).join('')+'</tr>';
+    var tbody=(s.rows||[]).map(function(mr,ri){
+      var r=rById(mr.rid);if(!r)return '';
+      return '<tr'+(ri%2?' class="alt"':'')+'><td class="td-r"><span class="rc">'+esc(r.code)+'</span>'+esc(r.name)+'</td>'+
+        (mr.v||[]).map(function(v){return '<td style="text-align:center" class="'+cellCls(v)+'">'+esc(v)+'</td>'}).join('')+'</tr>';
+    }).join('');
+    return '<div class="svc-card"><div class="svc-hd" onclick="toggleSvc('+si+')"><span class="svc-cat">'+esc(s.cat)+'</span><span class="svc-nm">'+esc(s.name)+'</span><span class="svc-arrow" id="sa'+si+'">▶</span></div>'+
+      '<div class="svc-body" id="sb'+si+'">'+(s.note?'<div class="svc-note">'+esc(s.note)+'</div>':'')+
+      '<div class="tbl-wrap"><table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table></div></div></div>';
+  }).join('');
+}
+function toggleSvc(i){var b=document.getElementById('sb'+i),a=document.getElementById('sa'+i);var o=b.classList.toggle('open');a.classList.toggle('open',o);a.textContent=o?'▼':'▶';}
+
+// ══════════════ RIGHTS TABLE ══════════════
+function renderRT() {
+  var q=(document.getElementById('rq').value||'').toLowerCase(),pc=document.getElementById('rPc').value;
+  var list=DB.rights.filter(function(r){return (!pc||r.pcode===pc)&&(!q||r.name.toLowerCase().indexOf(q)>=0||r.code.toLowerCase().indexOf(q)>=0)});
+  var tb=document.getElementById('rTbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="7" class="empty">ไม่พบสิทธิ</td></tr>';return;}
+  tb.innerHTML=list.map(function(r){
+    var pb={'ลูกหนี้สิทธิ':'b-pay1','ชำระเองเบิกได้':'b-pay2','ชำระเองเบิกไม่ได้':'b-pay3'};
+    return '<tr style="'+(r.status==='inactive'?'opacity:.5':'')+'"><td><span class="bdg b-code">'+esc(r.code)+'</span></td><td><span class="bdg b-pc">'+esc(r.pcode)+'</span></td>'+
+      '<td>'+esc(r.name)+'</td><td style="font-size:11px;color:var(--txt2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.finName)+'</td>'+
+      '<td><span class="bdg '+(pb[r.paidst]||'')+'">'+esc(r.paidst)+'</span></td>'+
+      '<td><span class="bdg '+(r.status==='active'?'b-on':'b-off')+'">'+(r.status==='active'?'ใช้งาน':'ยกเลิก')+'</span></td>'+
+      '<td style="white-space:nowrap"><button class="btn btn-sm btn-b" onclick="openRM('+r.id+')">แก้ไข</button> '+
+      '<button class="btn btn-sm '+(r.status==='active'?'btn-d':'btn-s')+'" onclick="togR('+r.id+')">'+(r.status==='active'?'ยกเลิก':'เปิดใช้')+'</button></td></tr>';
+  }).join('');
+}
+function togR(id){var r=rById(id);if(r){r.status=r.status==='active'?'inactive':'active';save();renderAll();}}
+
+// ══════════════ RIGHT MODAL ══════════════
+function openRM(id){
+  editRId=id;document.getElementById('rmT').textContent=id?'แก้ไขสิทธิ':'เพิ่มสิทธิ';
+  var r=id?rById(id):null;
+  document.getElementById('rf-c').value=r?r.code:'';document.getElementById('rf-p').value=r?r.pcode:'UC';
+  document.getElementById('rf-n').value=r?r.name:'';document.getElementById('rf-h').value=r?r.hip:'';
+  document.getElementById('rf-fc').value=r?r.finCode:'';document.getElementById('rf-fn').value=r?r.finName:'';
+  document.getElementById('rf-ps').value=r?r.paidst:'ลูกหนี้สิทธิ';document.getElementById('rf-st').value=r?r.status:'active';
+  document.getElementById('rf-no').value=r?r.note:'';
+  openMdl('rmBg');
+}
+function saveR(){
+  var c=document.getElementById('rf-c').value.trim(),n=document.getElementById('rf-n').value.trim(),fn=document.getElementById('rf-fn').value.trim();
+  if(!c||!n||!fn){alert('กรุณากรอก รหัส ชื่อสิทธิ และชื่อบัญชีการเงิน');return;}
+  var d={code:c,pcode:document.getElementById('rf-p').value,name:n,hip:document.getElementById('rf-h').value.trim(),
+    finCode:document.getElementById('rf-fc').value.trim(),finName:fn,paidst:document.getElementById('rf-ps').value,
+    status:document.getElementById('rf-st').value,note:document.getElementById('rf-no').value.trim()};
+  if(editRId){Object.assign(rById(editRId),d);}else{d.id=Math.max(0,...DB.rights.map(function(r){return r.id}))+1;DB.rights.push(d);}
+  save();closeMdl('rmBg');renderAll();toast('บันทึกสิทธิสำเร็จ');
+}
+
+// ══════════════ SVC MANAGE ══════════════
+function renderSvcMg(){
+  var el=document.getElementById('svcMgList');
+  if(!DB.services.length){el.innerHTML='<div class="empty">ยังไม่มีบริการ</div>';return;}
+  el.innerHTML=DB.services.map(function(s){
+    var tags=(s.rows||[]).slice(0,5).map(function(mr){var r=rById(mr.rid);return r?'<span class="bdg b-code" style="font-size:9px">'+esc(r.code)+'</span>':''}).join(' ');
+    var conds=[];if(s.gender)conds.push(s.gender);if(s.ageMin>0||s.ageMax<999)conds.push('อายุ '+(s.ageMin||0)+'-'+(s.ageMax>=999?'∞':s.ageMax)+' ปี');if(s.nat)conds.push(s.nat);
+    var condBdg=conds.length?'<span class="bdg" style="background:#FAEEDA;color:#633806;font-size:9px;margin-left:4px">'+conds.join(' | ')+'</span>':'';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--border-l);border-radius:8px;margin-bottom:6px;flex-wrap:wrap">'+
+      '<span class="bdg '+(s.status==='active'?'b-on':'b-off')+'">'+s.status+'</span>'+
+      '<span class="bdg b-pc">'+esc(s.cat)+'</span>'+
+      '<span style="font-weight:600;flex:1;min-width:140px">'+esc(s.name)+'</span>'+
+      '<div style="flex:2;min-width:100px">'+tags+condBdg+'</div>'+
+      '<button class="btn btn-sm btn-b" onclick="openSM('+s.id+')">แก้ไข</button>'+
+      '<button class="btn btn-sm '+(s.status==='active'?'btn-d':'btn-s')+'" onclick="togS('+s.id+')">'+(s.status==='active'?'ปิด':'เปิด')+'</button></div>';
+  }).join('');
+}
+function togS(id){var s=DB.services.find(function(x){return x.id===id});if(s){s.status=s.status==='active'?'inactive':'active';save();renderAll();}}
+
+// ══════════════ SVC MODAL ══════════════
+function openSM(id){
+  editSId=id;checkedRIds=[];rowCache={};
+  document.getElementById('smT').textContent=id?'แก้ไขบริการ':'เพิ่มบริการ';
+  var s=id?DB.services.find(function(x){return x.id===id}):null;
+  document.getElementById('sf-cat').value=s?s.cat:'';document.getElementById('sf-nm').value=s?s.name:'';
+  document.getElementById('sf-co').value=s?s.cols:'';document.getElementById('sf-no').value=s?s.note:'';
+  document.getElementById('sf-st').value=s?s.status:'active';document.getElementById('pkS').value='';
+  document.getElementById('sf-gen').value=s?s.gender||'':'';
+  document.getElementById('sf-nat').value=s?s.nat||'':'';
+  document.getElementById('sf-amin').value=s&&s.ageMin!==undefined&&s.ageMin>0?s.ageMin:'';
+  document.getElementById('sf-amax').value=s&&s.ageMax!==undefined&&s.ageMax<999?s.ageMax:'';
+  if(s){checkedRIds=(s.rows||[]).map(function(r){return r.rid});(s.rows||[]).forEach(function(r){rowCache[r.rid]=r.v.slice()});}
+  renderPK();renderRE();openMdl('smBg');
+}
+function renderPK(){
+  var q=(document.getElementById('pkS').value||'').toLowerCase();
+  var list=DB.rights.filter(function(r){return r.status==='active'&&(!q||r.name.toLowerCase().indexOf(q)>=0||r.code.toLowerCase().indexOf(q)>=0)});
+  document.getElementById('pkList').innerHTML=list.map(function(r){
+    return '<label class="pk-item"><input type="checkbox" '+(checkedRIds.indexOf(r.id)>=0?'checked':'')+' onchange="onPK('+r.id+',this.checked)"><span class="bdg b-code">'+esc(r.code)+'</span><span>'+esc(r.name)+'</span></label>';
+  }).join('');
+}
+function onPK(id,ch){if(ch&&checkedRIds.indexOf(id)<0)checkedRIds.push(id);if(!ch)checkedRIds=checkedRIds.filter(function(x){return x!==id});renderRE();}
+function renderRE(){
+  var cols=(document.getElementById('sf-co').value||'').split(',').map(function(c){return c.trim()}).filter(Boolean);
+  var el=document.getElementById('reWrap');
+  if(!checkedRIds.length||!cols.length){el.innerHTML=checkedRIds.length&&!cols.length?'<div style="font-size:11px;color:var(--txt3);margin-top:8px">กรุณากรอกหัวคอลัมน์ก่อน</div>':'';return;}
+  el.innerHTML='<div style="font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:6px">กรอกค่าบริการ</div>'+
+    checkedRIds.map(function(rid){var r=rById(rid);if(!r)return '';var cache=rowCache[rid]||[];
+      return '<div class="re-item"><div class="re-title"><span class="bdg b-code">'+esc(r.code)+'</span>'+esc(r.name)+'</div>'+
+        '<div class="re-grid">'+cols.map(function(c,i){return '<div><label>'+esc(c)+'</label><input id="rv_'+rid+'_'+i+'" value="'+(cache[i]||'')+'" placeholder="ตามสิทธิ / ชำระเงินเอง"></div>'}).join('')+'</div></div>';
+    }).join('');
+}
+function saveS(){
+  var cat=document.getElementById('sf-cat').value.trim(),nm=document.getElementById('sf-nm').value.trim();
+  if(!cat||!nm){alert('กรุณากรอกหมวดบริการและชื่อบริการ');return;}
+  var cols=(document.getElementById('sf-co').value||'').split(',').map(function(c){return c.trim()}).filter(Boolean);
+  var rows=checkedRIds.map(function(rid){var v=cols.map(function(_,i){var el=document.getElementById('rv_'+rid+'_'+i);return el?el.value.trim():''});return {rid:rid,v:v}});
+  var amin=parseFloat(document.getElementById('sf-amin').value);var amax=parseFloat(document.getElementById('sf-amax').value);
+  var d={cat:cat,name:nm,cols:document.getElementById('sf-co').value.trim(),note:document.getElementById('sf-no').value.trim(),status:document.getElementById('sf-st').value,rows:rows,gender:document.getElementById('sf-gen').value,nat:document.getElementById('sf-nat').value,ageMin:isNaN(amin)?0:amin,ageMax:isNaN(amax)?999:amax};
+  if(editSId){Object.assign(DB.services.find(function(x){return x.id===editSId}),d);}else{d.id=Math.max(0,...DB.services.map(function(s){return s.id}))+1;DB.services.push(d);}
+  save();closeMdl('smBg');renderAll();toast('บันทึกบริการสำเร็จ');
+}
+
+// ══════════════ SLIDES ══════════════
+function buildSlideHTML(svc){
+  var cols=(svc.cols||'').split(',').map(function(c){return c.trim()}).filter(Boolean);
+  var thead='<tr><th style="text-align:left;padding:6px 8px;background:#085041;color:#fff;font-size:11px;border:1px solid #064033;min-width:200px">สิทธิการรักษา</th>'+cols.map(function(c){return '<th style="text-align:center;padding:6px 8px;background:#085041;color:#fff;font-size:11px;border:1px solid #064033">'+esc(c)+'</th>'}).join('')+'</tr>';
+  var tbody=(svc.rows||[]).map(function(mr,ri){
+    var r=rById(mr.rid);if(!r)return '';
+    return '<tr style="'+(ri%2?'background:#f0f7f4':'')+'"><td style="padding:5px 8px;border:1px solid #dde3df;font-weight:600;font-size:11px;background:#f8faf9"><span style="background:#E1F5EE;color:#085041;font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;margin-right:3px">'+esc(r.code)+'</span>'+esc(r.name)+'</td>'+
+      (mr.v||[]).map(function(v){var cls=v==='ตามสิทธิ'?'background:#EAF3DE;color:#27500A;font-weight:600':v.indexOf('ฟรีโครงการ')>=0||v.indexOf('PPFS')>=0?'background:#E6F1FB;color:#0C447C;font-weight:600':v.indexOf('ชำระ')>=0?'background:#FCEBEB;color:#791F1F':'';return '<td style="text-align:center;padding:5px 8px;border:1px solid #dde3df;font-size:11px;'+cls+'">'+esc(v)+'</td>'}).join('')+'</tr>';
+  }).join('');
+  return '<div style="background:#085041;padding:14px 20px;border-bottom:3px solid #1D9E75"><div style="font-size:18px;font-weight:700;color:#fff">'+esc(svc.cat)+'</div><div style="font-size:12px;color:#9FE1CB;margin-top:2px">'+esc(svc.name)+'</div></div>'+
+    (svc.note?'<div style="margin:10px 16px;padding:6px 10px;background:#FFF8F0;border-left:4px solid #BA7517;border-radius:4px;font-size:11px;color:#633806;line-height:1.6;white-space:pre-wrap">'+esc(svc.note)+'</div>':'')+
+    '<div style="padding:10px 16px;overflow:auto"><table style="width:100%;border-collapse:collapse"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table></div>';
+}
+function buildSlides(){
+  slData=[];
+  slData.push('<div style="background:#085041;display:flex;min-height:100%;align-items:center;padding:40px"><div style="flex:1;padding:20px 40px"><div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;margin-bottom:14px;border:2px solid rgba(255,255,255,.2)">รพ.</div><div style="font-size:14px;color:#9FE1CB">โรงพยาบาลบ่อไร่</div><div style="font-size:36px;font-weight:700;color:#fff;line-height:1.25;margin:12px 0 20px">แนวทางสิทธิ<br>การรักษาพยาบาล</div><div style="font-size:12px;color:#9FE1CB">กลุ่มงานประกันสุขภาพ ยุทธศาสตร์ และสารสนเทศทางการแพทย์</div></div><div style="width:200px;background:#0F6E56;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 16px;text-align:center;min-height:300px;border-radius:0 0 0 0"><div style="font-size:12px;color:#9FE1CB;margin-bottom:6px">สายด่วน สปสช.</div><div style="font-size:48px;font-weight:700;color:#F9E795">1330</div><div style="font-size:11px;color:#9FE1CB;margin-top:8px">กด 2 พิมพ์เลขบัตรประชาชน<br>ตามด้วย #</div></div></div>');
+  DB.services.filter(function(s){return s.status==='active'}).forEach(function(svc){slData.push(buildSlideHTML(svc))});
+  slData.push('<div style="background:#1A2E28;display:flex;align-items:center;justify-content:center;min-height:100%;text-align:center;padding:40px;position:relative"><div style="position:absolute;top:50%;left:0;right:0;height:3px;background:#1D9E75"></div><div style="position:relative;z-index:1"><div style="font-size:14px;color:#1D9E75;margin-bottom:10px">โรงพยาบาลบ่อไร่</div><div style="font-size:32px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:16px">ขอบคุณที่ไว้วางใจ<br>บริการของเรา</div><div style="font-size:12px;color:#9FE1CB">สายด่วน สปสช. 1330 | nhso.go.th</div></div></div>');
+}
+function showSL(i){slIdx=i;document.getElementById('slFrame').innerHTML=slData[i]||'';document.getElementById('slInfo').textContent=(i+1)+' / '+slData.length;}
+function openSlideView(){buildSlides();slIdx=0;showSL(0);document.getElementById('slideOL').classList.add('open');document.body.style.overflow='hidden';}
+function closeSlide(){document.getElementById('slideOL').classList.remove('open');document.body.style.overflow='';}
+function nextSL(){if(slIdx<slData.length-1)showSL(slIdx+1)}
+function prevSL(){if(slIdx>0)showSL(slIdx-1)}
+function printSlides(){buildSlides();var w=window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>สไลด์สิทธิ รพ.บ่อไร่</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:sans-serif}@page{size:landscape;margin:0}.slide{page-break-after:always;width:100%;min-height:100vh}@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}</style></head><body>');
+  slData.forEach(function(h){w.document.write('<div class="slide">'+h+'</div>')});
+  w.document.write('</body></html>');w.document.close();setTimeout(function(){w.print()},600);
+}
+function printFromSlide(){closeSlide();setTimeout(printSlides,200)}
+
+// ══════════════ IMPORT/EXPORT ══════════════
+function exportJSON(){
+  var blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BoRai_Rights_'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('Export JSON สำเร็จ');
+}
+function importJSON(e){
+  var f=e.target.files[0];if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(d.rights&&d.services){DB=d;save();renderAll();toast('Import สำเร็จ: '+DB.rights.length+' สิทธิ, '+DB.services.length+' บริการ');}else{alert('ไฟล์ JSON ไม่ถูกรูปแบบ')}}catch(err){alert('อ่านไฟล์ไม่ได้: '+err.message)}};
+  reader.readAsText(f);
+}
+
+// ══════════════ UTILITIES ══════════════
+function openMdl(id){document.getElementById(id).classList.add('open')}
+function closeMdl(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-bg').forEach(function(el){el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')})});
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},3000)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+document.addEventListener('keydown',function(e){if(document.getElementById('slideOL').classList.contains('open')){if(e.key==='ArrowRight'||e.key==='ArrowDown')nextSL();if(e.key==='ArrowLeft'||e.key==='ArrowUp')prevSL();if(e.key==='Escape')closeSlide();}});
+
+init();
+</script>
+</body>
+</html>
